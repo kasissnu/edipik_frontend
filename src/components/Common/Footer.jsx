@@ -9,12 +9,9 @@ import instagram from "../../assets/images/instagram.svg";
 import linkedIn from "../../assets/images/linkedin.svg";
 import youtube from "../../assets/images/youtube.svg";
 import boxshadow from "../../assets/images/box-shadow.svg";
-import WaitList from "../WaitListModal";
+import { checkAuth } from "../../utils/checkAuth";
 
 const Footer = () => {
-	const [modalOpen, setModalOpen] = React.useState(false);
-	const handleOpenModal = () => setModalOpen(true);
-	const handleCloseModal = () => setModalOpen(false);
   
 	const navigate = useNavigate();
 
@@ -84,14 +81,19 @@ const Footer = () => {
 							{/* <CustomButton className="text-primary-950 mt-5 text-lg px-4">
 								Start today - get 1,000 AI edits on us!
 							</CustomButton> */}
-							<CustomButton 							
+							{!checkAuth() ? (
+								<CustomButton 							
 								variant="contained"
-								onClick={handleOpenModal}
+								onClick={()=>{
+									window.scrollTo({ top: 0, behavior: 'smooth' });
+									navigate("user/signin")}}
  								className="text-primary-950 mt-5 text-lg px-4"
 							>
-								Join us
+								<Typography className="text-black text-[17px]">
+										Sign in{" "}
+								</Typography>
 							</CustomButton>
-							<WaitList isOpen={modalOpen} onClose={handleCloseModal}/>
+							):(<></>)}
 						</Box>
 					</Box>
 				</Box>

@@ -1,7 +1,7 @@
 import React from "react";
 import { Box } from "@mui/material";
-import after from "../../assets/images/after.jpeg";
-import before from "../../assets/images/before.jpeg";
+import after from "../../assets/images/after.webp";
+import before from "../../assets/images/before.webp";
 import {
 	ReactCompareSlider,
 	ReactCompareSliderImage,

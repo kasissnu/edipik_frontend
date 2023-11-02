@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import CssBaseline from "@mui/material/CssBaseline";
+import IconButton from '@mui/material/IconButton';
 import Box from "@mui/material/Box";
 import Grid from "@mui/material/Grid";
 import Typography from "@mui/material/Typography";
@@ -7,14 +8,32 @@ import { Navigate, useNavigate, useSearchParams } from "react-router-dom";
 import { Container } from "@mui/material";
 import { resetPassword } from "../../app/services/UserServices";
 import { useForm } from "react-hook-form";
+import InputAdornment from '@mui/material/InputAdornment';
 import { LoadingButton } from "@mui/lab";
 import SendIcon from "@mui/icons-material/Send";
 import { checkAuth } from "../../utils/checkAuth";
 import { useNotification } from "../../utils/Hooks/useNotification";
 import { InputLabel, OutlinedInput } from "@mui/material";
 import resetBg from "../../assets/images/auth-bg.png";
+import Visibility from '@mui/icons-material/Visibility';
+import VisibilityOff from '@mui/icons-material/VisibilityOff';
+
 
 const ResetPassword = () => {
+	const [showPassword, setShowPassword] = React.useState(false);
+	const [showConfirmPassword, setShowConfirmPassword] = React.useState(false);
+
+	const handleClickShowPassword = () => setShowPassword((show) => !show);
+
+	const handleMouseDownPassword = (event) => {
+		event.preventDefault();
+	};
+
+	const handleClickShowConfirmPassword = () => setShowConfirmPassword((show) => !show);
+
+	const handleMouseDownConfirmPassword = (event) => {
+		event.preventDefault();
+	};
 	const { showNotification } = useNotification();
 	const {
 		register,
@@ -99,13 +118,23 @@ const ResetPassword = () => {
 									<Typography>Password</Typography>
 								</InputLabel>
 								<OutlinedInput
+									id="password"
 									margin="normal"
 									required
-									fullWidth
 									size="small"
-									type="password"
-									id="password"
-									className="px-8"
+									type={showPassword ? 'text' : 'password'}
+									endAdornment={
+									<InputAdornment position="end">
+										<IconButton
+										aria-label="toggle password visibility"
+										onClick={handleClickShowPassword}
+										onMouseDown={handleMouseDownConfirmPassword}
+										edge="end"
+										>
+										{showPassword ? <VisibilityOff /> : <Visibility />}
+										</IconButton>
+									</InputAdornment>
+									}
 									{...register("password", {
 										required: true,
 										minLength: 8,
@@ -134,12 +163,23 @@ const ResetPassword = () => {
 									<Typography>Confirm Password</Typography>
 								</InputLabel>
 								<OutlinedInput
+									id="confirm_password"
 									margin="normal"
 									required
-									fullWidth
 									size="small"
-									id="confirm_password"
-									name="confirm_password"
+									type={showConfirmPassword ? 'text' : 'password'}
+									endAdornment={
+									<InputAdornment position="end">
+										<IconButton
+										aria-label="toggle password visibility"
+										onClick={handleClickShowConfirmPassword}
+										onMouseDown={handleMouseDownPassword}
+										edge="end"
+										>
+										{showPassword ? <VisibilityOff /> : <Visibility />}
+										</IconButton>
+									</InputAdornment>
+									}
 									{...register("confirm_password", {
 										required: true,
 										minLength: 8,

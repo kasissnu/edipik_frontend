@@ -1,3 +1,4 @@
+/* eslint-disable */
 import React, { useEffect, useRef, useState } from "react";
 import { S3_BUCKET, s3 } from "../../config/awsConfig";
 import Box from "@mui/material/Box";
@@ -53,28 +54,6 @@ const ImageUpload = () => {
 		reconnectInterval: 3000,
 	});
 
-	useEffect(() => {
-		if (lastMessage !== null) {
-			const imageName = lastMessage.data;
-			// Stop Image process loader
-
-			// Fetch Enhanced image from AWS
-			const fetchEnhancedImage = async () => {
-				const result = await getObject(imageName);
-				setEnhanceImages((prev) => [...prev, result]);
-				setImageProcessing(false);
-				// console.log(enhanceImages);
-			};
-
-			fetchEnhancedImage();
-		}
-	}, [lastMessage]);
-
-	const delay = (milliseconds) => {
-		return new Promise((resolve) => setTimeout(resolve, milliseconds));
-	};
-
-	// Get presigned url form AWS
 	const getObject = async (keyName) => {
 		await delay(500);
 
@@ -106,6 +85,29 @@ const ImageUpload = () => {
 		}
 	};
 
+	
+	useEffect(() => {
+		if (lastMessage !== null) {
+			const imageName = lastMessage.data;
+			// Stop Image process loader
+
+			// Fetch Enhanced image from AWS
+			const fetchEnhancedImage = async () => {
+				const result = await getObject(imageName);
+				setEnhanceImages((prev) => [...prev, result]);
+				setImageProcessing(false);
+				// console.log(enhanceImages);
+			};
+
+			fetchEnhancedImage();
+		}
+	}, [lastMessage]);
+
+	const delay = (milliseconds) => {
+		return new Promise((resolve) => setTimeout(resolve, milliseconds));
+	};
+
+	// Get presigned url form AWS
 	// Handle Files uploaded by client
 	// @store in selectedFiles UseState
 	const handleFiles = (files) => {
@@ -391,6 +393,7 @@ const ImageUpload = () => {
 													handleImageLoad(index)
 												}
 												crossOrigin="anonymous"
+												alt="processed_image"
 											/>
 										</ImageListItem>
 									))}

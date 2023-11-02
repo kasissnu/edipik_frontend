@@ -1,17 +1,12 @@
 import { Box, Button, Container, Grid, Typography } from "@mui/material";
-import React, { useState } from "react";
+import React from "react";
 import ImageComparisonSlider from "./ImageComparisonSlider";
 import HeroBg from "../../assets/images/hero-bg.webp";
 import { Link } from "react-router-dom";
 import logo from "../../assets/images/logo.png";
 import CustomButton from "../Common/CustomButton";
-import WaitListModal from "../WaitListModal";
 
 const Hero = () => {
-	const [modalOpen, setModalOpen] = useState(false);
-	const handleOpenModal = () => setModalOpen(true);
-	const handleCloseModal = () => setModalOpen(false);
-
 	return (
 		<>
 			<Box
@@ -19,7 +14,7 @@ const Hero = () => {
 				// py={{ xs: 4, md: 8 }}
 			>
 				<div className="top-[-8rem] flex justify-center align-middle relative scale-x-[-1]">
-					<div className="w-full xl:w-[690px] h-full xl:h-[900px] rotate-90 absolute">
+					<div className="w-full sm:w-[690px] h-full sm:h-[900px] rotate-90 absolute">
 						<img
 							src={HeroBg}
 							alt="hero bg"
@@ -33,7 +28,7 @@ const Hero = () => {
 						spacing={12}
 						alignItems="center"
 						justifyContent={"center"}
-						className="h-full"
+						className="h-full lg:px-10"
 					>
 						<Grid item xs={12} sm={8} md={8} lg={8} 
 						// className="py-10"
@@ -77,7 +72,7 @@ const Hero = () => {
 								variant="subtitle1"
 								letterSpacing={1}
 								textAlign={"left"}
-								className="text-lg md:text-[1.6rem]"
+								className="text-lg md:text-[1.4rem]"
 							>
 								The premier AI-powered photo editing software
 								for professional photographers. Edipik is
@@ -87,7 +82,7 @@ const Hero = () => {
 							</Typography>
 							</Box>
 							<Box className="flex justify-center">
-								{/* <CustomButton
+								<CustomButton
 									variant="contained"
 									size="small"
 									sx={{
@@ -104,21 +99,7 @@ const Hero = () => {
 									<Typography className="text-black text-[17px]">
 										Sign in{" "}
 									</Typography>
-								</CustomButton> */}
-								<CustomButton
-									variant="contained"
-									onClick={handleOpenModal}
-									sx={{
-										margin: "auto",
-										display: "flex",
-										fontWeight: "500",
-										fontSize: "17px",
-									}}
-									className="bg-secondary-600 rounded-full lg:hidden"
-								>
-									Join us
 								</CustomButton>
-								<WaitListModal isOpen={modalOpen} onClose={handleCloseModal} />
 							</Box>
 						</Grid>
 						<Grid
