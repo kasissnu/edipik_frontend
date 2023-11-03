@@ -5,6 +5,7 @@ import HeroBg from "../../assets/images/hero-bg.webp";
 import { Link } from "react-router-dom";
 import logo from "../../assets/images/logo.png";
 import CustomButton from "../Common/CustomButton";
+import { checkAuth } from "../../utils/checkAuth";
 
 const Hero = () => {
 	return (
@@ -81,26 +82,30 @@ const Hero = () => {
 								photo edits with ease.
 							</Typography>
 							</Box>
-							<Box className="flex justify-center">
-								<CustomButton
-									variant="contained"
-									size="small"
-									sx={{
-										margin: "auto",
-										display: "flex",
-										fontWeight: "500",
-										fontSize: "14px",
-									}}
-									component={Link}
-									to={"/user/signin"}
-									color="bg-[#d1d5db] hover:bg-[#9ca3af]"
-									className="px-8 py-2 m-auto block lg:hidden"
-								>
-									<Typography className="text-black text-[17px]">
-										Sign in{" "}
-									</Typography>
-								</CustomButton>
-							</Box>
+							{checkAuth()?(
+								<></>
+							):(
+								<Box className="flex justify-center">
+									<CustomButton
+										variant="contained"
+										size="small"
+										sx={{
+											margin: "auto",
+											display: "flex",
+											fontWeight: "500",
+											fontSize: "14px",
+										}}
+										component={Link}
+										to={"/user/signin"}
+										color="bg-[#d1d5db] hover:bg-[#9ca3af]"
+										className="px-8 py-2 m-auto block lg:hidden"
+									>
+										<Typography className="text-black text-[17px]">
+											Sign in{" "}
+										</Typography>
+									</CustomButton>
+								</Box>
+							)}
 						</Grid>
 						<Grid
 							item
