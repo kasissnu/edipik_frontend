@@ -17,8 +17,13 @@ import logo from "../../assets/images/logo.png";
 import MenuIcon from "@mui/icons-material/Menu";
 import CloseIcon from "@mui/icons-material/Close";
 import { checkAuth } from "../../utils/checkAuth";
+import WaitListModal from "../WaitListModal";
 
 const Header = () => {
+	const [modalOpen, setModalOpen] = useState(false);
+	const handleOpenModal = () => setModalOpen(true);
+	const handleCloseModal = () => setModalOpen(false);
+  
 	// Hooks
 	const { showNotification } = useNotification();
 	const navigate = useNavigate();
@@ -187,10 +192,7 @@ const Header = () => {
 										</CustomButton> */}
 										<CustomButton
 											variant="contained"
-											onClick={()=>{
-												window.scrollTo({ top: 0, behavior: 'smooth' });
-												navigate("user/signin")
-											}}
+											onClick={handleOpenModal}
 											sx={{
 												margin: "auto",
 												display: "flex",
@@ -199,10 +201,9 @@ const Header = () => {
 											}}
 											className="bg-secondary-600 rounded-full"
 										>
-											<Typography className="text-black text-[17px]">
-												Sign in{" "}
-											</Typography>
+											Join us
 										</CustomButton>
+										<WaitListModal isOpen={modalOpen} onClose={handleCloseModal} />
 									</>
 								) : (
 									<>
@@ -419,10 +420,7 @@ const Header = () => {
 								</CustomButton> */}
 								<CustomButton
 									variant="contained"
-									onClick={()=>{
-										window.scrollTo({ top: 0, behavior: 'smooth' });
-										navigate("user/signin")
-									}}
+									onClick={handleOpenModal}
 									sx={{
 										margin: "auto",
 										display: "flex",
@@ -431,10 +429,9 @@ const Header = () => {
 									}}
 									className="bg-secondary-600 rounded-full"
 								>
-									<Typography className="text-black text-[17px]">
-										Sign in{" "}
-									</Typography>
+									Join us
 								</CustomButton>
+								<WaitListModal isOpen={modalOpen} onClose={handleCloseModal} />
 							</>
 						)}
 					</Box>

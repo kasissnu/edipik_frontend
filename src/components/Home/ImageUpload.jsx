@@ -4,6 +4,8 @@ import { S3_BUCKET, s3 } from "../../config/awsConfig";
 import Box from "@mui/material/Box";
 import Grid from "@mui/material/Grid";
 import Typography from "@mui/material/Typography";
+import CircularProgress from '@mui/material/CircularProgress';
+import { useNotification } from "../../utils/Hooks/useNotification";
 import {
 	Button,
 	Dialog,
@@ -20,6 +22,7 @@ import ImageIcon from "@mui/icons-material/Image";
 import { v4 as uuidv4 } from "uuid";
 import { getApiUrl } from "../../utils/getApiUrl";
 import useWebSocket from "react-use-websocket";
+import AWS from 'aws-sdk';
 
 const ImageUpload = () => {
 	const imagesRef = useRef([]);
@@ -31,6 +34,13 @@ const ImageUpload = () => {
 	const [reConnect, setReConnect] = useState(false);
 	const [imageProcessing, setImageProcessing] = useState(false);
 	const [enhanceImages, setEnhanceImages] = useState(() => []);
+	const [download, setDownload] = useState(false);
+	const [sessionName, setSessionName] = useState('')
+	const [enhanceImagesCount, setEnhanceImagesCount] = useState(0);
+	const [filesCount, setFilesCount] = useState(0);
+	const [downloading, setDownloading] = useState(false);
+	const { showNotification } = useNotification();
+	
 
 	const [visible, setVisible] = useState(6);
 
@@ -46,6 +56,14 @@ const ImageUpload = () => {
 	// Create a websocket connection with backend
 	const socketUrl = `ws://${getApiUrl("WS")}/celery-results`;
 	const { sendJsonMessage, lastMessage } = useWebSocket(socketUrl, {
+		onOpen: () => {
+			// setDownload(false);
+			console.log("connection opened")
+		},
+		onClose: () => {
+			setDownload(true);
+			console.log("connection closed")
+		},
 		shouldReconnect: (closeEvent) => {
 			console.log("Reconnecting....");
 			return reConnect === true;
@@ -54,6 +72,34 @@ const ImageUpload = () => {
 		reconnectInterval: 3000,
 	});
 
+
+
+	useEffect(() => {
+		console.log("lastMessage*****", lastMessage)
+		if (lastMessage !== null) {
+			const imageName = lastMessage.data;
+			console.log("imageName****", imageName)
+			// Stop Image process loader
+
+			// Fetch Enhanced image from AWS
+			const fetchEnhancedImage = async () => {
+				const result = await getObject(imageName);
+				setEnhanceImages((prev) => [...prev, result]);
+				setImageProcessing(false);
+				setEnhanceImagesCount(enhanceImagesCount + 1);
+			};
+
+			fetchEnhancedImage();
+		}
+	}, [lastMessage]);
+
+
+
+	const delay = (milliseconds) => {
+		return new Promise((resolve) => setTimeout(resolve, milliseconds));
+	};
+
+	// Get presigned url form AWS
 	const getObject = async (keyName) => {
 		await delay(500);
 
@@ -76,7 +122,6 @@ const ImageUpload = () => {
 			};
 
 			const url = await s3.getSignedUrlPromise("getObject", params);
-			// console.log("The URL is", url);
 
 			return url;
 		} catch (err) {
@@ -85,34 +130,10 @@ const ImageUpload = () => {
 		}
 	};
 
-	
-	useEffect(() => {
-		if (lastMessage !== null) {
-			const imageName = lastMessage.data;
-			// Stop Image process loader
-
-			// Fetch Enhanced image from AWS
-			const fetchEnhancedImage = async () => {
-				const result = await getObject(imageName);
-				setEnhanceImages((prev) => [...prev, result]);
-				setImageProcessing(false);
-				// console.log(enhanceImages);
-			};
-
-			fetchEnhancedImage();
-		}
-	}, [lastMessage]);
-
-	const delay = (milliseconds) => {
-		return new Promise((resolve) => setTimeout(resolve, milliseconds));
-	};
-
-	// Get presigned url form AWS
 	// Handle Files uploaded by client
 	// @store in selectedFiles UseState
 	const handleFiles = (files) => {
 		if (!files) return;
-		console.log("files", files);
 
 		if (files === "File type is not supported") {
 			window.alert("file not supported");
@@ -130,8 +151,8 @@ const ImageUpload = () => {
 			return !isDuplicate;
 		});
 
-		// console.log("selected", selected);
 		setSelectedFiles(selected);
+		setFilesCount(selected.length);
 	};
 
 	const DropZone = (
@@ -179,6 +200,7 @@ const ImageUpload = () => {
 		setActive(false);
 		handleResetValue();
 		const folderName = `session-${uuidv4()}`;
+		setSessionName(folderName);
 		const uploadFiles = [];
 		// Create a folder in AWS S3
 		await s3
@@ -201,11 +223,13 @@ const ImageUpload = () => {
 
 		// send data to websocket
 		setReConnect(true);
+		setSelectedFiles([]);
 		sendJsonMessage(data);
 
 		// changes value of state tor rerender view
 		setActive(true);
 		setSelectedFiles([]);
+		setEnhanceImagesCount(0);
 		setImageProcessing(true);
 	};
 
@@ -222,6 +246,46 @@ const ImageUpload = () => {
 		if (image) {
 			// console.log(image);
 			image.setAttribute("crossorigin", "");
+		}
+	};
+
+
+	const handleDownload = () => {
+		// Create an S3 instance
+		const s3 = new AWS.S3();
+		setDownloading(true);
+
+		// Get the S3 object
+		try {
+			s3.getObject(
+				{
+					Bucket: S3_BUCKET,
+					Key: sessionName + "/enhanced_images.zip",
+				},
+				(err, data) => {
+					if (err) {
+						console.error('Error downloading the zip file:', err);
+						setDownloading(false);
+						showNotification("Error downloading the zip file", "error");
+						return;
+					}
+					console.error('data :', data);
+
+					// Create a download link and trigger the download
+					const url = window.URL.createObjectURL(new Blob([data.Body]));
+					const link = document.createElement('a');
+					link.href = url;
+					link.setAttribute('download', 'enhanced-images.zip'); // Replace with your desired file name
+					document.body.appendChild(link);
+					link.click();
+					setDownloading(false)
+				}
+			);
+		}
+		catch {
+			console.log("error while downloading");
+			setDownloading(false);
+			showNotification("Error downloading the zip file", "error");
 		}
 	};
 
@@ -372,6 +436,22 @@ const ImageUpload = () => {
 					</Container>
 				)}
 
+				{(filesCount > 0 && enhanceImagesCount === filesCount) && (
+					<Box className="flex justify-center">
+						<Button
+							variant="contained"
+							className="m-4 bg-secondary-600"
+							onClick={handleDownload}
+						>
+							Download Zip &nbsp;&nbsp;
+							{downloading ? (
+								<CircularProgress size={'1.2rem'} color="primary" />
+							) : (<></>)}
+						</Button>
+
+					</Box>
+
+				)}
 				{enhanceImages.length !== 0 && (
 					<Container>
 						<Box sx={{ margin: "auto" }}>
@@ -384,8 +464,8 @@ const ImageUpload = () => {
 										>
 											<img
 												ref={(el) =>
-													(imagesRef.current[index] =
-														el)
+												(imagesRef.current[index] =
+													el)
 												}
 												src={`${img}`}
 												srcSet={`${img}`}
@@ -393,7 +473,6 @@ const ImageUpload = () => {
 													handleImageLoad(index)
 												}
 												crossOrigin="anonymous"
-												alt="processed_image"
 											/>
 										</ImageListItem>
 									))}
