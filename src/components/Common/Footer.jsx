@@ -35,11 +35,11 @@ const Footer = () => {
 		{
 			name: "instagram",
 			icon: instagram,
-			link: "https://instagram.com",
+			link: "https://www.instagram.com/edipik.ai/",
 		},
-		{ name: "facebook", icon: facebook, link: "https://facebook.com" },
-		{ name: "youtube", icon: youtube, link: "https://youtube.com" },
-		{ name: "linkedin", icon: linkedIn, link: "https://linkedIn.com" },
+		{ name: "facebook", icon: facebook, link: "" },
+		{ name: "youtube", icon: youtube, link: "" },
+		{ name: "linkedin", icon: linkedIn, link: "https://in.linkedin.com/company/edipik" },
 	];
 
 	return (
@@ -213,17 +213,18 @@ const Footer = () => {
 											}}
 											className="items-center shadow-md flex justify-center shadow-black"
 										>
-											<Button
-												href={socialLink.link}
-												sx={{ color: "inherit" }}
-											>
-												<img
-													src={socialLink.icon}
-													alt={socialLink.name}
-													width={36}
-													height={36}
-												/>
-											</Button>
+											<a href={socialLink.link} target="_blank" rel="noopener noreferrer">
+												<Button
+													sx={{ color: "inherit" }}
+												>
+													<img
+														src={socialLink.icon}
+														alt={socialLink.name}
+														width={36}
+														height={36}
+													/>
+												</Button>
+											</a>
 										</Box>
 									</Grid>
 								))}
